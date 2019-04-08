@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from loss import spread_loss, cross_entropy, margin_loss
 from network import baseline_model_kimcnn, baseline_model_cnn, capsule_model_A, capsule_model_B
 from sklearn.utils import shuffle
@@ -157,7 +157,7 @@ if args.embedding_type == 'multi-channel':
     X_2 = X_2[...,tf.newaxis]
     X_embedding = tf.concat([X_1,X_2],axis=-1)
 
-tf.logging.info("input dimension:{}".format(X_embedding.get_shape()))
+tf.logging.info("input dimension:{}".format(X_embedding.get_shape())) #input dimension:(25, 200, 300, 1)
 
 if args.model_type == 'capsule-A':    
     poses, activations = capsule_model_A(X_embedding, args.num_classes)    
@@ -212,7 +212,7 @@ m = args.margin
 for epoch in range(args.num_epochs):
     for iteration in range(1, n_iterations_per_epoch + 1):                
         X_batch, y_batch = mr_train.next()     
-        y_batch = utils.to_categorical(y_batch, args.num_classes)        
+        y_batch = utils.to_categorical(y_batch, args.num_classes)
         _, loss_train, probs, capsule_pose = sess.run(
             [training_op, loss, activations, poses],
             feed_dict={X: X_batch[:,:args.max_sent],

@@ -62,15 +62,16 @@ def capsule_model_B(X, num_classes):
     return poses, activations
 
 def capsule_model_A(X, num_classes):
+    #input dimension:(25, 200, 300, 1)
     with tf.variable_scope('capsule_'+str(3)):   
         nets = _conv2d_wrapper(
                 X, shape=[3, 300, 1, 32], strides=[1, 2, 1, 1], padding='VALID', 
                 add_bias=True, activation_fn=tf.nn.relu, name='conv1'
-            )
+            )  #output shape: (25, 99, 1, 32)
         tf.logging.info('output shape: {}'.format(nets.get_shape()))
         nets = capsules_init(nets, shape=[1, 1, 32, 16], strides=[1, 1, 1, 1], 
-                             padding='VALID', pose_shape=16, add_bias=True, name='primary')                        
-        nets = capsule_conv_layer(nets, shape=[3, 1, 16, 16], strides=[1, 1, 1, 1], iterations=3, name='conv2')
-        nets = capsule_flatten(nets)
-        poses, activations = capsule_fc_layer(nets, num_classes, 3, 'fc2') 
+                             padding='VALID', pose_shape=16, add_bias=True, name='primary')    # (25, 99, 1, 16, 16)
+        nets = capsule_conv_layer(nets, shape=[3, 1, 16, 16], strides=[1, 1, 1, 1], iterations=3, name='conv2')  #25, 97, 1, 16, 16   #25, 97, 1, 16
+        nets = capsule_flatten(nets)#25, 97*16, 16   #25, 97*16
+        poses, activations = capsule_fc_layer(nets, num_classes, 3, 'fc2')
     return poses, activations
